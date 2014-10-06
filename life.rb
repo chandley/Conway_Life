@@ -4,6 +4,26 @@ class Cell
 		@status = :dead
 		@neighbours = []
 	end
+
+	def status_next_generation cell
+
+		case cell.neighbours.select{|neigbour| neighbour.status == :alive}.count
+
+			when 0,1
+				return :dead
+			when 2 
+				if @status == :alive 
+				 return :alive 
+				else
+				 return :dead
+				end			
+			when 3
+				return :alive
+			when 4..8
+				return :dead
+		end
+	end
+
 end
 
 class Board
@@ -37,17 +57,29 @@ class Board
 			row = row < 0 ? row + 10 : row > 9 ? row - 10 : row
 			(cell_column-1..cell_column+1).each do |col|
 				col = col < 0 ? col + 10 : col > 9 ? col - 10 : col
-#				[row, col].each do |index| 	
-#					index += @cells.count if index < 0
-#					index -= @cells.count if index > @cells.count - 1
-#					index += 10 if index < 0
-#					index -= 10 if index > 9
-#				end
 				neighbours.push @cells[row][col] unless (row == cell_row && col == cell_column)
 			end
 		end
 		return neighbours	
 	end
+
+	def next_generation
+		next_cells = []
+		max_index = @cells.count -1 # there is a problem here!
+		max_index = 9		# temporary fix!
+		puts "max index #{max_index}"
+		(0..max_index).each do |row|
+			next_row = []
+			(0..max_index).each do |col|
+				new_cell = Cell.new
+				new_cell.status = status_next_generation @cells[row][col] #rescue new_cell.status = :alive
+				next_row.push new_cell
+			end
+			next_cells.push next_row
+		end
+		return next_cells
+	end
+
 
 	def show 
 		cells.each do |row|
@@ -65,17 +97,28 @@ class Board
 			puts ''
 		end
 		puts '-'* (cells.count*2+1)
-
 	end
-end
 
-class Generation
-	#has Board
 end
 
 class Game
-	#has generations
+	def initialize
+		@generations = []
+		@generations.push @current_generation = Board.new
+		@current_generation.show
+	end
+
+	def create_next_generation
+		new_generation = Board.new
+		new_generation.cells = @current_generation.next_generation
+		@generations.push @current_generation = new_generation
+		@current_generation.show
+	end
 end
 
-my_board = Board.new
-my_board.show
+my_game = Game.new
+loop do
+	wait = gets 
+	my_game.create_next_generation
+end
+
