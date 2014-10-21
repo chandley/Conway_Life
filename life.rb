@@ -7,7 +7,7 @@ class Cell
 
 	def status_next_generation mycell	
 
-		case (mycell.neighbours.select{|neigbour| neighbour.status == :alive}).count	
+		case mycell.neighbours.count{|neigbour| neighbour.status == :alive}
 			when 0,1
 				return :dead
 			when 2 
@@ -68,21 +68,30 @@ class Board
 		max_index = @cells.count -1 # there is a problem here!
 		max_index = 9		# temporary fix!
 		puts "max index #{max_index}"
+		puts "cells count #{@cells.count}"
+		puts "cells status #{@cells[1][5].status.to_s}"
+		puts "cell neighbours count #{@cells[1][5].neighbours.count}"
 		(0..max_index).each do |row|
 			next_row = []
 			(0..max_index).each do |col|
-				current_cell = @cells[row][col]
+				current_cell = @cells [row][col]
+				puts "cell neighbours 2 count #{current_cell.neighbours.count}"
 				new_cell = Cell.new
 	#			puts current_cell.status
 	#			puts row,col
 	#			puts status_next_generation(current_cell) rescue new_cell.status = :alive
-				new_cell.status = status_next_generation (current_cell) rescue new_cell.status = :alive
+	
+				new_cell.status = status_next_generation current_cell #rescue new_cell.status = :alive
+	#			new_cell.status = :alive
 				next_row.push new_cell
+				puts new_cell.status == :alive ?  "ALIVE" :  "DEAD"
 			end
 			next_cells.push next_row
 		end
+
+		#by copying values into cells, don't need to recreate neighbour relationships
 		(0..9).each do |row|
-			(0..9).each {|col| next_cells[row][col].neighbours = get_neighbours(row,col)}
+			(0..9).each {|col| @cells[row][col].status = next_cells[row][col].status}
 		end
 		return next_cells
 	end
@@ -123,7 +132,6 @@ end
 
 my_game = Game.new
 
-#puts status_next_generation my_game.board.cells[1][1].to_s generates error
 loop do
 	gets
 	my_game.create_next_generation
