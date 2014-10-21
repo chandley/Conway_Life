@@ -5,10 +5,9 @@ class Cell
 		@neighbours = []
 	end
 
-	def status_next_generation cell
+	def status_next_generation mycell	
 
-		case mycount = cell.neighbours.select{|neigbour| neighbour.status == :alive}.count
-			
+		case (mycell.neighbours.select{|neigbour| neighbour.status == :alive}).count	
 			when 0,1
 				return :dead
 			when 2 
@@ -22,7 +21,7 @@ class Cell
 			when 4..8
 				return :dead
 		end
-		puts mycount
+		
 	end
 
 end
@@ -74,10 +73,16 @@ class Board
 			(0..max_index).each do |col|
 				current_cell = @cells[row][col]
 				new_cell = Cell.new
-				new_cell.status = status_next_generation (current_cell) #rescue new_cell.status = :alive
+	#			puts current_cell.status
+	#			puts row,col
+	#			puts status_next_generation(current_cell) rescue new_cell.status = :alive
+				new_cell.status = status_next_generation (current_cell) rescue new_cell.status = :alive
 				next_row.push new_cell
 			end
 			next_cells.push next_row
+		end
+		(0..9).each do |row|
+			(0..9).each {|col| next_cells[row][col].neighbours = get_neighbours(row,col)}
 		end
 		return next_cells
 	end
@@ -120,7 +125,7 @@ my_game = Game.new
 
 #puts status_next_generation my_game.board.cells[1][1].to_s generates error
 loop do
-	
+	gets
 	my_game.create_next_generation
 end
 
