@@ -1,13 +1,16 @@
 class Cell
 	attr_accessor :status, :neighbours
+
 	def initialize
 		@status = :dead
 		@neighbours = []
 	end
+
 end
 
 class Board
 	attr_accessor :cells
+
 	def initialize (size = 10)
 		@cells = []
 		@max_index = size - 1
@@ -29,15 +32,16 @@ class Board
 		@cells [3][1].status = :alive
 		@cells [3][2].status = :alive
 
-		@cells [7][7].neighbours.each {|cell| cell.status = :alive}
+	#	@cells [7][7].neighbours.each {|cell| cell.status = :alive}
 	end
 
 	def get_neighbours cell_row, cell_column
 		neighbours = []
+		size = @max_index + 1
 		(cell_row-1..cell_row+1).each do |row|
-			row = row < 0 ? row + 10 : row > 9 ? row - 10 : row
+			row = row < 0 ? row + size : row > @max_index ? row - size : row
 			(cell_column-1..cell_column+1).each do |col|
-				col = col < 0 ? col + 10 : col > 9 ? col - 10 : col
+				col = col < 0 ? col + size : col > @max_index ? col - size : col
 				neighbours.push @cells[row][col] unless (row == cell_row && col == cell_column)
 			end
 		end
@@ -96,7 +100,7 @@ end
 
 class Game
 	def initialize
-		@current_generation = Board.new
+		@current_generation = Board.new(15)
 		@current_generation.show
 	end
 
