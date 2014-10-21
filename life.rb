@@ -75,13 +75,20 @@ class Board
 			next_row = []
 			(0..max_index).each do |col|
 				current_cell = @cells [row][col]
-				puts "cell neighbours 2 count #{current_cell.neighbours.count}"
+				puts "cell neighbours 2 count #{current_cell.neighbours.count {|neighbour| neighbour.status == :alive}}"
 				new_cell = Cell.new
-	#			puts current_cell.status
-	#			puts row,col
-	#			puts status_next_generation(current_cell) rescue new_cell.status = :alive
-	
-				new_cell.status = status_next_generation current_cell #rescue new_cell.status = :alive
+
+				case 	current_cell.neighbours.count {|neighbour| neighbour.status == :alive}
+				when 3
+					new_cell.status = :alive
+				when 2
+					new_cell.status = current_cell.status 
+				else
+					new_cell.status = :dead
+				end
+
+
+	#			new_cell.status = status_next_generation current_cell #rescue new_cell.status = :alive
 	#			new_cell.status = :alive
 				next_row.push new_cell
 				puts new_cell.status == :alive ?  "ALIVE" :  "DEAD"
@@ -125,7 +132,7 @@ class Game
 
 
 	def create_next_generation	
-		@current_generation.cells = @current_generation.next_generation
+		@current_generation.next_generation
 		@current_generation.show
 	end
 end
