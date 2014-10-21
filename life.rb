@@ -4,41 +4,22 @@ class Cell
 		@status = :dead
 		@neighbours = []
 	end
-
-	def status_next_generation mycell	
-
-		case mycell.neighbours.count{|neigbour| neighbour.status == :alive}
-			when 0,1
-				return :dead
-			when 2 
-				if @status == :alive 
-				 return :alive 
-				else
-				 return :dead
-				end			
-			when 3
-				return :alive
-			when 4..8
-				return :dead
-		end
-		
-	end
-
 end
 
 class Board
 	attr_accessor :cells
 	def initialize (size = 10)
 		@cells = []
+		@max_index = size - 1
 		#populate empty cells
-		(0..size-1).each do |row|
+		(0..@max_index).each do |row|
 			row = []
-			(0..size-1).each {row.push Cell.new}
+			(0..@max_index).each {row.push Cell.new}
 			@cells.push row
 		end
 		#populate cell neighbours
-		(0..size-1).each do |row|
-			(0..size-1).each {|col| cells[row][col].neighbours = get_neighbours(row,col)}
+		(0..@max_index).each do |row|
+			(0..@max_index).each {|col| cells[row][col].neighbours = get_neighbours(row,col)}
 		end
 
 		#setup content - add from file later
@@ -64,18 +45,11 @@ class Board
 	end
 
 	def next_generation
-		next_cells = []
-		max_index = @cells.count -1 # there is a problem here!
-		max_index = 9		# temporary fix!
-		puts "max index #{max_index}"
-		puts "cells count #{@cells.count}"
-		puts "cells status #{@cells[1][5].status.to_s}"
-		puts "cell neighbours count #{@cells[1][5].neighbours.count}"
-		(0..max_index).each do |row|
+		next_cells = [] 
+		(0..@max_index).each do |row|
 			next_row = []
-			(0..max_index).each do |col|
+			(0..@max_index).each do |col|
 				current_cell = @cells [row][col]
-				puts "cell neighbours 2 count #{current_cell.neighbours.count {|neighbour| neighbour.status == :alive}}"
 				new_cell = Cell.new
 
 				case 	current_cell.neighbours.count {|neighbour| neighbour.status == :alive}
@@ -87,18 +61,14 @@ class Board
 					new_cell.status = :dead
 				end
 
-
-	#			new_cell.status = status_next_generation current_cell #rescue new_cell.status = :alive
-	#			new_cell.status = :alive
 				next_row.push new_cell
-				puts new_cell.status == :alive ?  "ALIVE" :  "DEAD"
 			end
 			next_cells.push next_row
 		end
 
 		#by copying values into cells, don't need to recreate neighbour relationships
-		(0..9).each do |row|
-			(0..9).each {|col| @cells[row][col].status = next_cells[row][col].status}
+		(0..@max_index).each do |row|
+			(0..@max_index).each {|col| @cells[row][col].status = next_cells[row][col].status}
 		end
 		return next_cells
 	end
